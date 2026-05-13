@@ -10,7 +10,7 @@ beforeAll(() => {
 
 afterEach(() => fetchMock.assertNoPendingInterceptors());
 
-function mockMistral(status: number, body: unknown): void {
+function mockMistral(status: number, body: object): void {
   fetchMock
     .get("https://api.mistral.ai")
     .intercept({ method: "POST", path: "/v1/chat/completions" })
@@ -111,7 +111,9 @@ describe("forwarding naar Mistral", () => {
     });
     expect(resp.status).toBe(200);
     expect(resp.headers.get("Access-Control-Allow-Origin")).toBe(ORIGIN);
-    const data = await resp.json();
+    const data = (await resp.json()) as {
+      choices: { message: { content: string } }[];
+    };
     expect(data.choices[0].message.content).toContain("entiteiten");
   });
 
