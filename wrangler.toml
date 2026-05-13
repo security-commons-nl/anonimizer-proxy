@@ -1,0 +1,26 @@
+name = "anonimizer-proxy"
+main = "src/worker.ts"
+compatibility_date = "2026-05-01"
+
+# Sta CORS toe vanaf de productie-frontend. Voeg lokale dev-origins toe
+# via secrets/vars in CI of via `wrangler secret put`.
+[vars]
+ALLOWED_ORIGINS = "https://security-commons-nl.github.io"
+MISTRAL_BASE_URL = "https://api.mistral.ai"
+MISTRAL_MODEL = "mistral-large-latest"
+
+# Rate limiting: max requests per IP per 60 seconden.
+# Binding gebruikt Cloudflare's native rate-limiter (geen KV nodig).
+[[unsafe.bindings]]
+name = "RATE_LIMITER"
+type = "ratelimit"
+namespace_id = "1001"
+simple = { limit = 20, period = 60 }
+
+# MISTRAL_API_KEY moet als secret worden gezet via:
+#   wrangler secret put MISTRAL_API_KEY
+# Niet in deze file, niet in git.
+
+[observability]
+enabled = true
+head_sampling_rate = 0.1

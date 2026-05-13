@@ -1,0 +1,31 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Vereist twee secrets in de repo settings:
+#   CLOUDFLARE_API_TOKEN — token met "Edit Cloudflare Workers" permission
+#   CLOUDFLARE_ACCOUNT_ID — account id
+#
+# De MISTRAL_API_KEY moet eenmalig via `wrangler secret put MISTRAL_API_KEY`
+# worden geplaatst — die zit niet in deze workflow.
+
+jobs:
+  deploy:
+    if: github.repository == 'security-commons-nl/anonimizer-proxy'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm install --no-audit --no-fund
+      - run: npm test
+      - uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

@@ -1,0 +1,14 @@
+node_modules/
+.wrangler/
+.dev.vars
+.dev.vars.*
+dist/
+coverage/
+
+# AI tooling
+.claude/
+.codesight/
+CLAUDE.md
+AGENTS.md
+codex.md
+.cursorrules
