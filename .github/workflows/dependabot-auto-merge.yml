@@ -4,6 +4,9 @@ name: Dependabot auto-merge
 # heeft een verhoogd security-belang (forward't naar betaalde API,
 # secret-management), dus minor-bumps verdienen handmatige review.
 
+# Geen goedkeurstap: GitHub staat niet toe dat Actions een pull request goedkeuren
+# ("GitHub Actions is not permitted to approve pull requests"), en geen enkele
+# main-branch hier eist een review. De stap liet de workflow alleen maar rood staan.
 on: pull_request
 
 permissions:
@@ -21,13 +24,6 @@ jobs:
         uses: dependabot/fetch-metadata@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Approve PR
-        if: steps.meta.outputs.update-type == 'version-update:semver-patch'
-        run: gh pr review --approve "$PR_URL"
-        env:
-          PR_URL: ${{ github.event.pull_request.html_url }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Enable auto-merge
         if: steps.meta.outputs.update-type == 'version-update:semver-patch'

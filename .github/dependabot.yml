@@ -1,6 +1,10 @@
 version: 2
 updates:
   - package-ecosystem: "npm"
+    groups:
+      npm:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
     directory: "/"
     schedule:
       interval: "weekly"
@@ -17,6 +21,10 @@ updates:
       semver-patch-days: 7
 
   - package-ecosystem: "github-actions"
+    groups:
+      actions:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
     directory: "/"
     schedule:
       interval: "weekly"
