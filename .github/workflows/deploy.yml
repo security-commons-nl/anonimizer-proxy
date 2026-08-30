@@ -1,8 +1,8 @@
 name: Deploy
 
+# Handmatig starten: zonder CLOUDFLARE_API_TOKEN kan wrangler niet uitrollen, en bij elke push
+# draaien laat de workflow dan permanent rood staan. Wie de secrets heeft, start hem zelf.
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 # Vereist twee secrets in de repo settings:
