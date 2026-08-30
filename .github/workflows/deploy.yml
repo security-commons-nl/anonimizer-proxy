@@ -23,7 +23,9 @@ jobs:
         with:
           node-version: "22"
           cache: npm
-      - run: npm install --no-audit --no-fund
+      # npm ci volgt de lockfile exact. Met npm install lost npm de versies opnieuw op en
+      # kan een nieuwe peer-eis van een dependency de build breken zonder dat hier iets wijzigde.
+      - run: npm ci --no-audit --no-fund
       - run: npm test
       - uses: cloudflare/wrangler-action@v3
         with:

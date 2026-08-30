@@ -5,6 +5,13 @@ updates:
       npm:
         patterns: ["*"]
         update-types: ["minor", "patch"]
+    ignore:
+      # Wacht op de migratie naar vitest 4. @cloudflare/vitest-pool-workers 0.21 eist vitest ^4.1
+      # en heeft fetchMock uit "cloudflare:test" gehaald; de testsuite leunt daarop.
+      - dependency-name: "vitest"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@cloudflare/vitest-pool-workers"
+        update-types: ["version-update:semver-minor", "version-update:semver-major"]
     directory: "/"
     schedule:
       interval: "weekly"
