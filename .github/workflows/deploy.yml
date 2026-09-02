@@ -12,6 +12,11 @@ on:
 # De MISTRAL_API_KEY moet eenmalig via `wrangler secret put MISTRAL_API_KEY`
 # worden geplaatst — die zit niet in deze workflow.
 
+# Het token van deze workflow mag alleen lezen. Dat is nu ook de standaard van de
+# organisatie, maar expliciet blijft het staan als die standaard ooit verandert.
+permissions:
+  contents: read
+
 jobs:
   deploy:
     if: github.repository == 'security-commons-nl/anonimizer-proxy'
