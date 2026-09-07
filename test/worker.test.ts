@@ -1,20 +1,34 @@
-import { SELF, fetchMock } from "cloudflare:test";
-import { beforeAll, afterEach, describe, expect, it } from "vitest";
+import { SELF } from "cloudflare:test";
+import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } from "vitest";
 
 const ORIGIN = "https://security-commons-nl.github.io";
 
-beforeAll(() => {
-  fetchMock.activate();
-  fetchMock.disableNetConnect();
+// De Worker draait in dezelfde isolate als de test en gebruikt de globale fetch voor Mistral.
+// Die vervangen we per test; fetchMock uit cloudflare:test bestaat sinds pool-workers 0.22 niet meer.
+// Zonder mock gaat er niets naar buiten: elke onverwachte aanroep is een fout in de test.
+let uitgaand: MockInstance<typeof fetch>;
+
+beforeEach(() => {
+  uitgaand = vi.spyOn(globalThis, "fetch").mockImplementation(async (invoer) => {
+    const url = invoer instanceof Request ? invoer.url : String(invoer);
+    throw new Error(`onverwachte uitgaande fetch naar ${url}`);
+  });
 });
 
-afterEach(() => fetchMock.assertNoPendingInterceptors());
+afterEach(() => vi.restoreAllMocks());
 
 function mockMistral(status: number, body: object): void {
-  fetchMock
-    .get("https://api.mistral.ai")
-    .intercept({ method: "POST", path: "/v1/chat/completions" })
-    .reply(status, body, { headers: { "Content-Type": "application/json" } });
+  uitgaand.mockImplementation(async (invoer, init) => {
+    const url = invoer instanceof Request ? invoer.url : String(invoer);
+    const methode = invoer instanceof Request ? invoer.method : (init?.method ?? "GET");
+    if (url !== "https://api.mistral.ai/v1/chat/completions" || methode !== "POST") {
+      throw new Error(`onverwachte uitgaande fetch: ${methode} ${url}`);
+    }
+    return new Response(JSON.stringify(body), {
+      status,
+      headers: { "Content-Type": "application/json" },
+    });
+  });
 }
 
 describe("OPTIONS preflight", () => {
